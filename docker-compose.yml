@@ -1,0 +1,46 @@
+
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/ocjene
+      DB_USER: elvir
+      DB_PASSWORD: elvir123
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ocjene
+      POSTGRES_USER: elvir
+      POSTGRES_PASSWORD: elvir123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
+volumes:
+  postgres_data:
