@@ -18,7 +18,6 @@ import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import java.util.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
-
 fun main() {
     embeddedServer(Netty, port = 8080, module = Application::module).start(wait = true)
 }
@@ -30,7 +29,6 @@ data class Narudzba(
     val broj: String,
     val kolicina: Int
 )
-
 
 @Serializable
 data class Odgovor(val message: String, val ime: String, val broj: String, val kolicina: Int)
@@ -44,13 +42,12 @@ object Narudzbe : Table() {
 }
 
 fun Application.module() {
-	Database.connect(
-    url = System.getenv("DB_URL"),
-    driver = "org.postgresql.Driver",
-    user = System.getenv("DB_USER"),
-    password = System.getenv("DB_PASSWORD")
-	)
-
+    Database.connect(
+        url = System.getenv("DB_URL"),
+        driver = "org.postgresql.Driver",
+        user = System.getenv("DB_USER"),
+        password = System.getenv("DB_PASSWORD")
+    )
 
     transaction {
         createMissingTablesAndColumns(Narudzbe)
@@ -132,7 +129,13 @@ fun Application.module() {
             call.respondText("HELLO WORLD")
             call.logger.info("Respond[end]")
         }
+
+        // ✅ HEALTH ruta za ALB provjere
+        get("/health") {
+            call.respondText("OK", ContentType.Text.Plain)
+        }
     }
 }
+
 
 
